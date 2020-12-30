@@ -5,8 +5,9 @@ use std::str;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let directions = load_input("input01.txt")?;
 
-    let mut floor = 0;
-    let mut pos = 0;
+    let mut floor: i32 = 0;
+    let mut pos: u32 = 0;
+    let mut basement_pos: u32 = 0;
 
     for d in directions.chars() {
         pos += 1;
@@ -17,12 +18,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         }
 
-        if floor == -1 {
-            break
+        if floor == -1 && basement_pos == 0 {
+            basement_pos = pos;
         }
     }
 
-    println!("{}", pos);
+    println!("End floor (part 1): {}", floor);
+    println!("Basement position (part2): {}", basement_pos);
 
     Ok(())
 }

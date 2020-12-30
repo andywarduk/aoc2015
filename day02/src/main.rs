@@ -7,11 +7,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let paper: u32 = parcels.iter().map(|p| p.paper()).sum();
 
-    println!("Total paper: {}", paper);
+    println!("Total paper (part 1): {}", paper);
 
     let ribbon: u32 = parcels.iter().map(|p| p.ribbon()).sum();
 
-    println!("Total ribbon: {}", ribbon);
+    println!("Total ribbon (part 2): {}", ribbon);
 
     Ok(())
 }
