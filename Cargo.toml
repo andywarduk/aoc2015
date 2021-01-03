@@ -25,4 +25,5 @@ members = [
     "day21",
     "day22",
     "day22-lib",
+    "day23",
 ]
