@@ -159,6 +159,13 @@ version = "0.1.0"
 [[package]]
 name = "day22"
 version = "0.1.0"
+dependencies = [
+ "day22-lib",
+]
+
+[[package]]
+name = "day22-lib"
+version = "0.1.0"
 
 [[package]]
 name = "hermit-abi"
