@@ -96,6 +96,6 @@ fn validate_pwdnum(pwdnum: &Vec<u8>) -> bool {
 
 #[test]
 fn test_calc_next_password() {
-    assert!(calc_next_password("abcdefgh") == "abcdffaa");
-    assert!(calc_next_password("ghijklmn") == "ghjaabcc");
+    assert!(calc_next_password("abcdefgh".to_string()) == "abcdffaa");
+    assert!(calc_next_password("ghijklmn".to_string()) == "ghjaabcc");
 }

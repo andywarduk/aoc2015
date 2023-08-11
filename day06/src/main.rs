@@ -34,7 +34,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }
@@ -49,21 +49,18 @@ fn part1(instructions: &Vec<Instruction>) {
     for _ in 0..1000 {
         let mut row = Vec::with_capacity(1000);
 
-        for _ in 0..1000 {
-            row.push(' ');
-        }
-
+        row.resize(1000, ' ');
         board.push(row);
     }
 
     for i in instructions {
-        for y in i.y1..=i.y2 {
-            for x in i.x1..=i.x2 {
-                board[y][x] = match i.action {
+        for row in board.iter_mut().take(i.y2 + 1).skip(i.y1) {
+            for cell in row.iter_mut().take(i.x2 + 1).skip(i.x1) {
+                *cell = match i.action {
                     Action::TurnOff => ' ',
                     Action::TurnOn => '*',
                     Action::Toggle => {
-                        match board[y][x] {
+                        match *cell {
                             ' ' => '*',
                             '*' => ' ',
                             _ => { panic!("Invalid board state") }
@@ -86,19 +83,13 @@ fn part2(instructions: &Vec<Instruction>) {
 
     // Construct light array
     for _ in 0..1000 {
-        let mut row = Vec::with_capacity(1000);
-
-        for _ in 0..1000 {
-            row.push(0);
-        }
-
-        board.push(row);
+        board.push(vec![0; 1000]);
     }
 
     for i in instructions {
-        for y in i.y1..=i.y2 {
-            for x in i.x1..=i.x2 {
-                board[y][x] = max(0, board[y][x] + match i.action {
+        for row in board.iter_mut().take(i.y2 + 1).skip(i.y1) {
+            for cell in row.iter_mut().take(i.x2 + 1).skip(i.x1) {
+                *cell = max(0, *cell + match i.action {
                     Action::TurnOff => -1,
                     Action::TurnOn => 1,
                     Action::Toggle => 2

@@ -11,13 +11,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(lines: &Vec<String>) {
+fn part1(lines: &[String]) {
     let sum: usize = lines.iter().map(decode_diff).sum();
 
     println!("Length difference is {} (part 1)", sum);
 }
 
-fn part2(lines: &Vec<String>) {
+fn part2(lines: &[String]) {
     let sum: usize = lines.iter().map(encode_diff).sum();
 
     println!("Length difference is {} (part 2)", sum);
@@ -58,7 +58,7 @@ fn encode_diff(string: &String) -> usize {
     count_encode_chars(string) - string.len()
 }
 
-fn count_encode_chars(string: &String) -> usize {
+fn count_encode_chars(string: &str) -> usize {
     let mut count = 0;
 
     for c in string.chars() {
@@ -98,7 +98,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

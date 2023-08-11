@@ -18,7 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(molecule: &String, fwd_replacements: &Replacements) {
+fn part1(molecule: &str, fwd_replacements: &Replacements) {
     let mut hashes = HashSet::new();
     let mut rep_count: u32 = 0;
 
@@ -49,7 +49,7 @@ fn part1(molecule: &String, fwd_replacements: &Replacements) {
     println!("Unique molecules from {} replacements (part 1): {}", rep_count, hashes.len());
 }
 
-fn split_molecule(molecule: &String) -> Vec<String> {
+fn split_molecule(molecule: &str) -> Vec<String> {
     let mut elements = Vec::new();
     let chars: Vec<char> = molecule.chars().collect();
 
@@ -69,7 +69,7 @@ fn split_molecule(molecule: &String) -> Vec<String> {
     elements
 }
 
-fn part2(molecule: &String, fwd_replacements: &Replacements, bwd_replacements: &Replacement) {
+fn part2(molecule: &str, fwd_replacements: &Replacements, bwd_replacements: &Replacement) {
     let mut min_rep = usize::MAX;
 
     let mut terminals = Replacement::new();
@@ -81,7 +81,7 @@ fn part2(molecule: &String, fwd_replacements: &Replacements, bwd_replacements: &
         let mut terminal = false;
 
         for s in split {
-            if fwd_replacements.get(&s) == None {
+            if fwd_replacements.get(&s).is_none() {
                 terminal = true;
                 break
             }
@@ -94,7 +94,7 @@ fn part2(molecule: &String, fwd_replacements: &Replacements, bwd_replacements: &
         }
     }
 
-    part2_iter(molecule.clone(), &terminals, &non_terminals, 0, &mut min_rep);
+    part2_iter(molecule.to_string(), &terminals, &non_terminals, 0, &mut min_rep);
 
     println!("Minimum replacements (part 2): {}", min_rep);
 }
@@ -165,7 +165,7 @@ fn parse_lines(lines: &Vec<String>) -> (Replacements, Replacement, String) {
     let mut molecule = "".to_string();
 
     for l in lines {
-        if l == "" {
+        if l.is_empty() {
             if in_replacements {
                 in_replacements = false;
                 continue

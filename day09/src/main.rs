@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn process(nodes: &HashSet<String>, edges: &Vec<Edge>) {
-    let start_list: Vec<String> = nodes.iter().map(|s| s.clone()).collect();
+    let start_list: Vec<String> = nodes.iter().cloned().collect();
 
     let mut lowest_dist = usize::MAX;
     let mut highest_dist = 0;
@@ -27,17 +27,17 @@ fn process(nodes: &HashSet<String>, edges: &Vec<Edge>) {
 }
 
 fn walk_tree(next: &String, parent_nodes: &HashSet<String>, edges: &Vec<Edge>,
-        parent_path: &Vec<String>, dist: usize,
+        parent_path: &[String], dist: usize,
         lowest_dist: &mut usize, highest_dist: &mut usize) {
     // Mark as visited
     let mut nodes = parent_nodes.clone();
     nodes.remove(next);
 
-    // 
-    let mut path = parent_path.clone();
+    // Copy path and add next
+    let mut path = parent_path.to_vec();
     path.push(next.clone());
 
-    if nodes.len() == 0 {
+    if nodes.is_empty() {
         // Finished
         println!("Route: {}  Distance: {}", path.join(" -> "), dist);
 
@@ -53,13 +53,11 @@ fn walk_tree(next: &String, parent_nodes: &HashSet<String>, edges: &Vec<Edge>,
     // Find outbound routes
     let choices = edges.iter().filter_map(|e| {
         if e.node1 == *next {
-            if nodes.get(&e.node2) != None {
+            if nodes.get(&e.node2).is_some() {
                 return Some((e.node2.clone(), e.dist))
             }
-        } else if e.node2 == *next {
-            if nodes.get(&e.node1) != None {
-                return Some((e.node1.clone(), e.dist))
-            }
+        } else if e.node2 == *next && nodes.get(&e.node1).is_some() {
+            return Some((e.node1.clone(), e.dist))
         }
 
         None
@@ -91,7 +89,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }
@@ -120,11 +118,11 @@ fn parse_edges(lines: &Vec<String>) -> (HashSet<String>, Vec<Edge>) {
             dist: caps[3].parse::<usize>().unwrap()
         });
 
-        if nodes.get(&caps[1]) == None {
+        if nodes.get(&caps[1]).is_none() {
             nodes.insert(caps[1].to_string());
         }
 
-        if nodes.get(&caps[2]) == None {
+        if nodes.get(&caps[2]).is_none() {
             nodes.insert(caps[2].to_string());
         }
     }

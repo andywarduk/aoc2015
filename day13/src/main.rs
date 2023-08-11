@@ -21,8 +21,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(nodes: &Vec<String>, edges: &HashMap<String, Edge>) -> i32 {
-    let mut order = nodes.clone();
+fn part1(nodes: &[String], edges: &HashMap<String, Edge>) -> i32 {
+    let mut order = nodes.to_vec();
     let remain = order.split_off(1);
     let mut optimal_happiness = 0;
 
@@ -54,7 +54,7 @@ fn part2(nodes: &Vec<String>, edges: &HashMap<String, Edge>) -> i32 {
 }
 
 fn process_combinations(order: Vec<String>, remain: Vec<String>, edges: &HashMap<String, Edge>, optimal_happiness: &mut i32) {
-    if remain.len() == 0 {
+    if remain.is_empty() {
         let happiness = calc_happiness(&order, edges);
 
         println!("{}, happiness {}", order.join(" - "), happiness);
@@ -92,11 +92,11 @@ fn calc_happiness(order: &Vec<String>, edges: &HashMap<String, Edge>) -> i32 {
     happiness
 }
 
-fn happiness_sum(person1: &String, person2: &String, edges: &HashMap<String, Edge>) -> i32 {
+fn happiness_sum(person1: &str, person2: &str, edges: &HashMap<String, Edge>) -> i32 {
     happiness_pair(person1, person2, edges) + happiness_pair(person2, person1, edges)
 }
 
-fn happiness_pair(person1: &String, person2: &String, edges: &HashMap<String, Edge>) -> i32 {
+fn happiness_pair(person1: &str, person2: &str, edges: &HashMap<String, Edge>) -> i32 {
     let happiness = edges.get(&edge_key(person1, person2)).unwrap();
 
     *happiness
@@ -121,7 +121,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }
@@ -150,12 +150,12 @@ fn parse_edges(lines: &Vec<String>) -> (Vec<String>, HashMap<String, Edge>) {
 
         edges.insert(edge_key(&caps[1], &caps[4]), happiness);
 
-        if nodeset.get(&caps[1]) == None {
+        if nodeset.get(&caps[1]).is_none() {
             nodeset.insert(caps[1].to_string());
         }
     }
 
-    let mut nodes: Vec<String> = nodeset.iter().map(|s| s.clone()).collect();
+    let mut nodes: Vec<String> = nodeset.iter().cloned().collect();
     nodes.sort();
 
     (nodes, edges)

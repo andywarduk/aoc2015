@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(lines: &Vec<String>) -> u16 {
+fn part1(lines: &[String]) -> u16 {
     let gates = parse_gates(lines);
 
     let mut signals = get_signals(&gates);
@@ -28,33 +28,18 @@ fn part1(lines: &Vec<String>) -> u16 {
     signal_a
 }
 
-fn part2(lines: &Vec<String>, part1sig: u16) {
+fn part2(lines: &[String], part1sig: u16) {
     let mut gates = parse_gates(lines);
 
     let mut signals = get_signals(&gates);
 
     // Find and remove signal b initialisation from the gates
-    let mut found = false;
-    let mut elem = 0;
+    let elem = gates
+        .iter()
+        .position(|gate| matches!(gate, Gate::Signal(outs, _) if outs == "b"))
+        .expect("Input b not found");
 
-    for (idx, gate) in gates.iter().enumerate() {
-        match gate {
-            Gate::Signal(outs, _) => {
-                if outs == "b" {
-                    elem = idx;
-                    found = true;
-                    break;
-                }
-            }
-            _ => {}
-        }
-    }
-
-    if found {
-        gates.swap_remove(elem);
-    } else {
-        panic!("Input b not found")
-    }
+    gates.swap_remove(elem);
 
     // Set signal b
     set_signal_value(&mut signals, &String::from("b"), part1sig);
@@ -66,7 +51,7 @@ fn part2(lines: &Vec<String>, part1sig: u16) {
 }
 
 fn resolve_gates(mut gates: Vec<Gate>, signals: &mut SignalMap) {
-    while gates.len() > 0 {
+    while !gates.is_empty() {
         let mut gate_no = 0;
 
         while gate_no < gates.len() {
@@ -75,41 +60,41 @@ fn resolve_gates(mut gates: Vec<Gate>, signals: &mut SignalMap) {
 
             match gate {
                 Gate::Signal(outs, ins) => {
-                    if let Some(value) = get_input_value(&signals, ins) {
+                    if let Some(value) = get_input_value(signals, ins) {
                         set_signal_value(signals, outs, value);
                         resolved = true;
                     }
                 },
                 Gate::And(outs, ins1, ins2) => {
-                    if let Some(value1) = get_input_value(&signals, ins1) {
-                        if let Some(value2) = get_input_value(&signals, ins2) {
+                    if let Some(value1) = get_input_value(signals, ins1) {
+                        if let Some(value2) = get_input_value(signals, ins2) {
                             set_signal_value(signals, outs, value1 & value2);
                             resolved = true;
                         }
                     }
                 },
                 Gate::Or(outs, ins1, ins2) => {
-                    if let Some(value1) = get_input_value(&signals, ins1) {
-                        if let Some(value2) = get_input_value(&signals, ins2) {
+                    if let Some(value1) = get_input_value(signals, ins1) {
+                        if let Some(value2) = get_input_value(signals, ins2) {
                             set_signal_value(signals, outs, value1 | value2);
                             resolved = true;
                         }
                     }
                 },
                 Gate::LShift(outs, ins, bits) => {
-                    if let Some(value) = get_input_value(&signals, ins) {
+                    if let Some(value) = get_input_value(signals, ins) {
                         set_signal_value(signals, outs, value << bits);
                         resolved = true;
                     }
                 },
                 Gate::RShift(outs, ins, bits) => {
-                    if let Some(value) = get_input_value(&signals, ins) {
+                    if let Some(value) = get_input_value(signals, ins) {
                         set_signal_value(signals, outs, value >> bits);
                         resolved = true;
                     }
                 },
                 Gate::Not(outs, ins) => {
-                    if let Some(value) = get_input_value(&signals, ins) {
+                    if let Some(value) = get_input_value(signals, ins) {
                         set_signal_value(signals, outs, !value);
                         resolved = true;
                     }
@@ -144,7 +129,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }
@@ -170,7 +155,7 @@ enum Gate {
     Not(Out, In), // Out, In
 }
 
-fn parse_gates(lines: &Vec<String>) -> Vec<Gate> {
+fn parse_gates(lines: &[String]) -> Vec<Gate> {
     let re_sig = Regex::new(r"^([a-z]+|\d+) -> ([a-z]+)$").unwrap();
     let re_andor = Regex::new(r"^([a-z]+|\d+) (AND|OR) ([a-z]+) -> ([a-z]+)$").unwrap();
     let re_sh = Regex::new(r"^([a-z]+) ([LR])SHIFT (\d+) -> ([a-z]+)$").unwrap();
@@ -209,7 +194,6 @@ fn parse_in(string: &str) -> In {
 
 #[derive(Debug)]
 struct Signal {
-    name: String,
     value: Option<u16>
 }
 
@@ -221,30 +205,30 @@ fn get_signals(gates: &Vec<Gate>) -> SignalMap {
     for gate in gates {
         match gate {
             Gate::Signal(outs, ins) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins);
             },
             Gate::And(outs, ins1, ins2) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins1);
-                add_in_signal(&mut signals, &ins2);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins1);
+                add_in_signal(&mut signals, ins2);
             },
             Gate::Or(outs, ins1, ins2) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins1);
-                add_in_signal(&mut signals, &ins2);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins1);
+                add_in_signal(&mut signals, ins2);
             },
             Gate::LShift(outs, ins, _) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins);
             },
             Gate::RShift(outs, ins, _) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins);
             },
             Gate::Not(outs, ins) => {
-                add_signal(&mut signals, &outs);
-                add_in_signal(&mut signals, &ins);
+                add_signal(&mut signals, outs);
+                add_in_signal(&mut signals, ins);
             }
         }
     }
@@ -252,16 +236,15 @@ fn get_signals(gates: &Vec<Gate>) -> SignalMap {
     signals
 }
 
-fn add_signal(signals: &mut SignalMap, signal: &String) {
-    signals.insert(signal.clone().to_string(), Signal {
-        name: signal.clone(),
+fn add_signal(signals: &mut SignalMap, signal: &str) {
+    signals.insert(signal.to_string(), Signal {
         value: None
     });
 }
 
 fn add_in_signal(signals: &mut SignalMap, ins: &In)  {
     if let In::Input(name) = ins {
-        add_signal(signals, &name);
+        add_signal(signals, name);
     }
 }
 
@@ -279,7 +262,7 @@ fn set_signal_value(signals: &mut SignalMap, name: &String, value: u16) {
 fn get_input_value(signals: &SignalMap, ins: &In) -> Option<u16> {
     match ins {
         In::Input(insig) => {
-            get_signal_value(&signals, insig)
+            get_signal_value(signals, insig)
         },
         In::Signal(value) => {
             Some(*value)

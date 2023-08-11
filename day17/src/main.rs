@@ -76,7 +76,7 @@ fn test_walk_capacities() {
     assert!(lists[3] == "10+15");
 }
 
-fn capacity_list(capacities: &Vec<u16>, used_bits: u64) -> String {
+fn capacity_list(capacities: &[u16], used_bits: u64) -> String {
     let mut capacity_list: String = String::from("");
 
     let mut bits = used_bits;
@@ -87,7 +87,7 @@ fn capacity_list(capacities: &Vec<u16>, used_bits: u64) -> String {
         if bits & bit != 0 {
             bits &= !bit;
 
-            if capacity_list == "" {
+            if capacity_list.is_empty() {
                 capacity_list = format!("{}", capacities[idx]);
             } else {
                 capacity_list = format!("{}+{}", capacity_list, capacities[idx]);
@@ -120,7 +120,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

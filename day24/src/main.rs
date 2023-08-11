@@ -65,7 +65,7 @@ fn calc_min_qe(weights: &Vec<u16>, compartments: u8) {
             for other in other_comp {
                 print!(", {}", weight_list(weights, other));
             }
-            println!("");
+            println!();
 
             break
         }
@@ -97,11 +97,9 @@ fn check_combination_iter(combinations: &Vec<u32>, bits: u32, full_mask: u32, ot
                 other_comp.push(filled);
                 return true
             }
-        } else {
-            if check_combination_iter(combinations, cur_mask, full_mask, other_comp, i + 1, depth - 1) {
-                other_comp.push(filled);
-                return true
-            }
+        } else if check_combination_iter(combinations, cur_mask, full_mask, other_comp, i + 1, depth - 1) {
+            other_comp.push(filled);
+            return true
         }
     }
 
@@ -125,7 +123,7 @@ fn walk_weights(weights: &Vec<u16>, target: u16, filled: u16, used_elems: usize,
     }
 }
 
-fn weight_list(weights: &Vec<u16>, used_bits: u32) -> String {
+fn weight_list(weights: &[u16], used_bits: u32) -> String {
     let mut weight_list: String = String::from("");
 
     let mut bits = used_bits;
@@ -136,7 +134,7 @@ fn weight_list(weights: &Vec<u16>, used_bits: u32) -> String {
         if bits & bit != 0 {
             bits &= !bit;
 
-            if weight_list == "" {
+            if weight_list.is_empty() {
                 weight_list = format!("{}", weights[idx]);
             } else {
                 weight_list = format!("{}+{}", weight_list, weights[idx]);
@@ -150,7 +148,7 @@ fn weight_list(weights: &Vec<u16>, used_bits: u32) -> String {
     weight_list
 }
 
-fn calc_qe(weights: &Vec<u16>, used_bits: u32) -> u64 {
+fn calc_qe(weights: &[u16], used_bits: u32) -> u64 {
     let mut result = 1;
 
     let mut bits = used_bits;
@@ -189,7 +187,7 @@ fn load_input(file: &str) -> Result<Vec<u16>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             weights.push(line.parse::<u16>().unwrap());
         }
     }

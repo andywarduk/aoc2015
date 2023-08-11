@@ -118,72 +118,65 @@ pub fn play(difficulty: Difficulty) -> Result {
 }
 
 fn player_turn(difficulty: &Difficulty, result: &mut Result, player: &mut PlayerState, boss: &mut BossState) {
-    loop {
-        // Player's turn
-        match difficulty {
-            Difficulty::Hard => {
-                player.hit_points -= 1;
+    // Player's turn
+    if let Difficulty::Hard = difficulty {
+        player.hit_points -= 1;
 
-                if player.hit_points == 0 {
-                    boss_win(result);
-                    break
-                }
-            }
-            _ => {}
-        };
-
-        if process_effects(player, boss) {
-            // Player has won
-            player_win(result, player);
-            break
+        if player.hit_points == 0 {
+            boss_win(result);
+            return
         }
+    }
 
-        // Cast a spell
-        let mut casted = false;
+    if process_effects(player, boss) {
+        // Player has won
+        player_win(result, player);
+        return
+    }
 
-        // Cast missile
-        if player.mana >= MISSILE_COST {
-            cast_missile(difficulty, result, player.clone(), boss.clone());
-            casted = true;
+    // Cast a spell
+    let mut casted = false;
+
+    // Cast missile
+    if player.mana >= MISSILE_COST {
+        cast_missile(difficulty, result, player.clone(), boss.clone());
+        casted = true;
+    }
+
+    // Cast drain
+    if player.mana >= DRAIN_COST {
+        cast_drain(difficulty, result, player.clone(), boss.clone());
+        casted = true;
+    }
+
+    // Cast shield
+    if player.mana >= SHIELD_COST && player.shield_timer == 0 {
+        cast_shield(difficulty, result, player.clone(), boss.clone());
+        casted = true;
+    }
+
+    // Cast poison
+    if player.mana >= POISON_COST && player.poison_timer == 0 {
+        cast_poison(difficulty, result, player.clone(), boss.clone());
+        casted = true;
+    }
+
+    // Cast recharge
+    if player.mana >= RECHARGE_COST && player.recharge_timer == 0 {
+        cast_recharge(difficulty, result, player.clone(), boss.clone());
+        casted = true;
+    }
+
+    if !casted {
+        // If player hasn't got enough mana to cast any spells and no recharge
+        // or damage inducing spells are active then boss with inevitably win
+        if player.recharge_timer == 0 && player.poison_timer == 0 {
+            boss_win(result);
+        } else {
+            // Boss turn with no cast
+            boss_turn(difficulty, result, player, boss);
         }
-
-        // Cast drain
-        if player.mana >= DRAIN_COST {
-            cast_drain(difficulty, result, player.clone(), boss.clone());
-            casted = true;
-        }
-
-        // Cast shield
-        if player.mana >= SHIELD_COST && player.shield_timer == 0 {
-            cast_shield(difficulty, result, player.clone(), boss.clone());
-            casted = true;
-        }
-
-        // Cast poison
-        if player.mana >= POISON_COST && player.poison_timer == 0 {
-            cast_poison(difficulty, result, player.clone(), boss.clone());
-            casted = true;
-        }
-
-        // Cast recharge
-        if player.mana >= RECHARGE_COST && player.recharge_timer == 0 {
-            cast_recharge(difficulty, result, player.clone(), boss.clone());
-            casted = true;
-        }
-
-        if !casted {
-            // If player hasn't got enough mana to cast any spells and no recharge
-            // or damage inducing spells are active then boss with inevitably win
-            if player.recharge_timer == 0 && player.poison_timer == 0 {
-                boss_win(result);
-            } else {
-                // Boss turn with no cast
-                boss_turn(difficulty, result, player, boss);
-            }
-        }
-
-        break
-    };
+    }
 }
 
 fn cast_missile(difficulty: &Difficulty, result: &mut Result, mut player: PlayerState, mut boss: BossState) {
@@ -244,24 +237,21 @@ fn cast_recharge(difficulty: &Difficulty, result: &mut Result, mut player: Playe
 }
 
 fn boss_turn(difficulty: &Difficulty, result: &mut Result, player: &mut PlayerState, boss: &mut BossState) {
-    loop {
-        // Boss's turn
-        if process_effects(player, boss) {
-            // Player has won
-            player_win(result, player);
-            break
-        };
+    // Boss's turn
+    if process_effects(player, boss) {
+        // Player has won
+        player_win(result, player);
+        return
+    };
 
-        if boss_attack(player) {
-            // Boss has won
-            boss_win(result);
-            break
-        };
+    if boss_attack(player) {
+        // Boss has won
+        boss_win(result);
+        return
+    };
 
-        // Recurse to player turn
-        player_turn(difficulty, result, player, boss);
-        break
-    }
+    // Recurse to player turn
+    player_turn(difficulty, result, player, boss);
 }
 
 fn process_effects(player: &mut PlayerState, boss: &mut BossState) -> bool {

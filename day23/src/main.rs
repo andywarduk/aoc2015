@@ -13,13 +13,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn part1(instructions: &Vec<Instruction>) {
-    let state = run_program(&instructions, 0);
+    let state = run_program(instructions, 0);
 
     println!("b register (part 1): {}", state.b);
 }
 
 fn part2(instructions: &Vec<Instruction>) {
-    let state = run_program(&instructions, 1);
+    let state = run_program(instructions, 1);
 
     println!("b register (part 2): {}", state.b);
 }
@@ -60,9 +60,10 @@ impl State {
 }
 
 fn run_program(instructions: &Vec<Instruction>, a_reg: u32) -> State {
-    let mut state: State = Default::default();
-
-    state.a = a_reg;
+    let mut state: State = State {
+        a: a_reg,
+        ..Default::default()
+    };
 
     while state.pc >= 0 && state.pc < instructions.len() as i16 {
         let instruction = &instructions[state.pc as usize];
@@ -127,7 +128,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

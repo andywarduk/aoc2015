@@ -17,12 +17,12 @@ fn walknode1(node: &JsonValue) -> f64 {
     match node {
         JsonValue::Object(obj) => {
             for (_key, value) in obj.iter() {
-                total += walknode1(&value);
+                total += walknode1(value);
             }
         },
         JsonValue::Array(arr) => {
             for node in arr {
-                total += walknode1(&node);
+                total += walknode1(node);
             }            
         },
         JsonValue::Number(num) => {
@@ -51,13 +51,13 @@ fn walknode2(node: &JsonValue) -> f64 {
 
             if !skip {
                 for (_key, value) in obj.iter() {
-                    total += walknode2(&value);
+                    total += walknode2(value);
                 }
             }
         },
         JsonValue::Array(arr) => {
             for node in arr {
-                total += walknode2(&node);
+                total += walknode2(node);
             }            
         },
         JsonValue::Number(num) => {

@@ -54,22 +54,22 @@ fn analyse_line1(line: &str) -> LineStatus {
     for i in 1..line.len() {
         match line.as_bytes()[i - 1] {
             b'a' => {
-                if line.as_bytes()[i] == 'b' as u8 { return LineStatus::Naughty }
+                if line.as_bytes()[i] == b'b' { return LineStatus::Naughty }
             },
             b'c' => {
-                if line.as_bytes()[i] == 'd' as u8 { return LineStatus::Naughty }
+                if line.as_bytes()[i] == b'd' { return LineStatus::Naughty }
             },
             b'p' => {
-                if line.as_bytes()[i] == 'q' as u8 { return LineStatus::Naughty }
+                if line.as_bytes()[i] == b'q' { return LineStatus::Naughty }
             },
             b'x' => {
-                if line.as_bytes()[i] == 'y' as u8 { return LineStatus::Naughty }
+                if line.as_bytes()[i] == b'y' { return LineStatus::Naughty }
             },
             _ => {}
         }
     }
 
-    return LineStatus::Nice
+    LineStatus::Nice
 }
 
 fn analyse_line2(line: &str) -> LineStatus {
@@ -141,7 +141,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

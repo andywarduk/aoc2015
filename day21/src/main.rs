@@ -71,11 +71,13 @@ impl<'a> Result<'a> {
 }
 
 type Callback<'a> = &'a mut dyn FnMut(&'static KitProfile, Option<&'static KitProfile>,
-    Option<&'static KitProfile>, Option<&'static KitProfile>) -> ();
+    Option<&'static KitProfile>, Option<&'static KitProfile>);
 
 fn part1() {
-    let mut result: Result = Default::default();
-    result.cost = u16::MAX;
+    let mut result: Result = Result {
+        cost: u16::MAX,
+        ..Default::default()
+    };
 
     let mut part1_play = |weapon: &'static KitProfile, armor: Option<&'static KitProfile>,
             ring1: Option<&'static KitProfile>, ring2: Option<&'static KitProfile>| {
@@ -176,11 +178,11 @@ fn choose_rings(callback: Callback, weapon: &'static KitProfile, armor: Option<&
     }
 
     // Two rings
-    for i in 0..RINGS.len() - 1 {
-        for j in i + 1..RINGS.len() {
-            equip_and_play(callback, weapon, armor, Some(&RINGS[i]), Some(&RINGS[j]));
+    for (i, ring1) in RINGS.iter().enumerate().take(RINGS.len() - 1) {
+        for ring2 in RINGS.iter().skip(i + 1) {
+            equip_and_play(callback, weapon, armor, Some(ring1), Some(ring2));
         }
-    } 
+    }
 }
 
 #[inline]

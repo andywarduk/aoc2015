@@ -28,11 +28,11 @@ fn transform(string: String) -> String {
         out_chars.push(char);
     };
 
-    for i in 1..chars.len() {
-        if chars[i] != last {
+    for c in chars.iter().skip(1) {
+        if *c != last {
             add(last, count);
             count = 0;
-            last = chars[i];
+            last = *c;
         }
         count += 1;
     }

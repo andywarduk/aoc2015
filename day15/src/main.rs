@@ -32,10 +32,8 @@ fn process(ingredients: &Vec<Qtys>) {
             max_total = total
         }
 
-        if tot_qtys.calories == CALORIE_TARGET as i32 {
-            if total > max_calorie_total {
-                max_calorie_total = total
-            }
+        if tot_qtys.calories == CALORIE_TARGET as i32 && total > max_calorie_total {
+            max_calorie_total = total
         }
     }
 
@@ -62,7 +60,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(sues: &Vec<Sue>) {
+fn part1(sues: &[Sue]) {
     let valid_sues: Vec<usize> = sues.iter().enumerate().filter_map(|(idx, sue)| {
         if match_sue1(sue) {
             Some(idx)
@@ -39,7 +39,7 @@ fn part1(sues: &Vec<Sue>) {
     println!("Valid Sue (part 1): {}", valid_sues[0] + 1);
 }
 
-fn part2(sues: &Vec<Sue>) {
+fn part2(sues: &[Sue]) {
     let valid_sues: Vec<usize> = sues.iter().enumerate().filter_map(|(idx, sue)| {
         if match_sue2(sue) {
             Some(idx)
@@ -141,7 +141,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }
@@ -173,7 +173,7 @@ fn parse_sues(lines: &Vec<String>) -> Vec<Sue> {
         let mut sue: Sue = Default::default();
 
         for t in terms {
-            let kv: Vec<_> = t.split(" ").collect();
+            let kv: Vec<_> = t.split(' ').collect();
 
             match kv[0] {
                 "children" => sue.children = Some(kv[1].parse::<u16>().unwrap()),

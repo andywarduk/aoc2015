@@ -1,6 +1,6 @@
 use memmap::Mmap;
 use regex::Regex;
-use std::{cmp::min, fs::File, io::{BufRead, BufReader}};
+use std::{cmp::{min, Ordering}, fs::File, io::{BufRead, BufReader}};
 
 const RACE_DUR: u32 = 2503;
 
@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn part1(reindeer: &Vec<Reindeer>) {
+fn part1(reindeer: &[Reindeer]) {
     let dists: Vec<u32> = reindeer.iter().map(|r| {
         let tot_times = RACE_DUR / r.total_dur;
         let remainder = RACE_DUR % r.total_dur;
@@ -40,7 +40,7 @@ struct ReindeerState<'a> {
     reindeer: &'a Reindeer,
 }
 
-fn part2(reindeer: &Vec<Reindeer>) {
+fn part2(reindeer: &[Reindeer]) {
     let mut state: Vec<ReindeerState> = reindeer.iter().map(|r| {
         ReindeerState {
             moving: true,
@@ -53,7 +53,7 @@ fn part2(reindeer: &Vec<Reindeer>) {
 
     for _ in 0..RACE_DUR {
         // Calculate next seconds
-        for mut rs in &mut state {
+        for rs in &mut state {
             if rs.moving {
                 rs.dist += rs.reindeer.speed;
             }
@@ -73,13 +73,13 @@ fn part2(reindeer: &Vec<Reindeer>) {
         // Find out who is winning
         let (leaders, _) = state.iter().enumerate()
             .fold((Vec::new(), 0), |(mut leaders, lead_dist), (idx, rs)| {
-                if rs.dist > lead_dist {
-                    (vec![idx], rs.dist)
-                } else if rs.dist == lead_dist {
-                    leaders.push(idx);
-                    (leaders, lead_dist)
-                } else {
-                    (leaders, lead_dist)
+                match rs.dist.cmp(&lead_dist) {
+                    Ordering::Greater => (vec![idx], rs.dist),
+                    Ordering::Equal => {
+                        leaders.push(idx);
+                        (leaders, lead_dist)    
+                    }
+                    Ordering::Less => (leaders, lead_dist),
                 }
             }
         );
@@ -113,7 +113,7 @@ fn load_input(file: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
+        if !line.is_empty() {
             lines.push(line);
         }
     }

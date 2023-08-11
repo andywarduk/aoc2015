@@ -94,8 +94,8 @@ fn load_input(file: &str) -> Result<Vec<Parcel>, Box<dyn std::error::Error>> {
     for line_res in buf_reader.lines() {
         let line = line_res?;
 
-        if line != "" {
-            let dim: Vec<_>  = line.split("x").map(|val| val.parse::<u32>().unwrap()).collect();
+        if !line.is_empty() {
+            let dim: Vec<_>  = line.split('x').map(|val| val.parse::<u32>().unwrap()).collect();
 
             parcels.push(Parcel {
                 l: dim[0],
