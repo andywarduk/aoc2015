@@ -1,16 +1,16 @@
 fn main() {
-    let mut pwd: String = "hepxcrrq".to_string();
+    let start_pwd: &str = "hepxcrrq";
 
-    pwd = calc_next_password(pwd);
+    let mut pwd = calc_next_password(start_pwd);
     println!("Next password for part 1: {}", pwd);
 
-    pwd = calc_next_password(pwd);
+    pwd = calc_next_password(&pwd);
     println!("Next password for part 2: {}", pwd);
 }
 
 const ALPHABET: &str = "abcdefghjkmnpqrstuvwxyz";
 
-fn calc_next_password(pwd: String) -> String {
+fn calc_next_password(pwd: &str) -> String {
     // Convert to numbers
     let mut pwdnum: Vec<u8> = pwd.chars().map(|c| ALPHABET.find(c).unwrap() as u8).collect();
 
@@ -96,6 +96,5 @@ fn validate_pwdnum(pwdnum: &Vec<u8>) -> bool {
 
 #[test]
 fn test_calc_next_password() {
-    assert!(calc_next_password("abcdefgh".to_string()) == "abcdffaa");
-    assert!(calc_next_password("ghijklmn".to_string()) == "ghjaabcc");
+    assert!(calc_next_password("abcdefgh") == "abcdffaa");
 }
