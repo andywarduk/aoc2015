@@ -1,5 +1,5 @@
 use json::JsonValue;
-use memmap::Mmap;
+use memmap2::Mmap;
 use std::fs::File;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

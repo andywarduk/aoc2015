@@ -1,4 +1,4 @@
-use memmap::Mmap;
+use memmap2::Mmap;
 use std::{cmp::min, fs::File, io::{BufRead, BufReader}};
 use std::str;
 

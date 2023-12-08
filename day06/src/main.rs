@@ -1,4 +1,4 @@
-use memmap::Mmap;
+use memmap2::Mmap;
 use regex::Regex;
 use std::{cmp::max, fs::File, io::{BufRead, BufReader}};
 use std::str;

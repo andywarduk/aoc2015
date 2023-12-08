@@ -1,4 +1,4 @@
-use memmap::Mmap;
+use memmap2::Mmap;
 use std::{collections::HashMap, fs::File};
 use std::str;
 
